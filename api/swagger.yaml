@@ -1,0 +1,603 @@
+swagger: '2.0'
+info:
+
+  title: RealSynch API
+  description: Real Estate Service Integration
+  version: "1.0.0"
+
+  contact:
+    email: haydenturek@clear-launch.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+
+host: virtserver.swaggerhub.com
+basePath: /Clear-Launch/RealSynch-API/1.0.0
+
+
+tags:
+- name: Synchs
+- name: SynchTypes
+- name: Tests
+
+
+paths:
+
+  /synchs:
+    post:
+      summary: Post a new integration
+      description: |
+        Create new integrations from templates obtained via GET @ /synchTypes/:id
+      operationId: postNewSynch
+      tags:
+      - Synchs
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+        - in: body
+          name: Request body
+          description: |
+            This object contains the data neccesary for creating a new synch between two applications, which are
+            called the "source" and "target" applications.
+          schema:
+            $ref: "#/definitions/Synch"
+      responses:
+        201:
+          $ref: "#/responses/Created"
+        400:
+          $ref: "#/responses/BadRequest"
+        401:
+          $ref: "#/responses/Unauthorized"
+        500:
+          $ref: "#/responses/ServerError"
+
+  /synchs/{id}:
+    get:
+      summary: Get an existing synch by ID
+      description: |
+        Get an existing synch by ID
+      operationId: getSynch
+      tags:
+      - Synchs
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+          format: int32
+          description: Numeric ID of an existing synch
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/Synch"
+        401:
+          $ref: "#/responses/Unauthorized"
+        404:
+          $ref: "#/responses/NotFound"
+        500:
+          $ref: "#/responses/ServerError"
+
+  /synchTypes:
+    get:
+      summary: Gets synchType index
+      description: |
+        Get the index of supported integrations. Each record includes an ID for individual lookup,
+        as well as image URLs for interface development.
+      operationId: getSynchTypeIndex
+      tags:
+      - SynchTypes
+      produces:
+      - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/SynchTypes"
+        500:
+          $ref: "#/responses/ServerError"
+
+  /synchTypes/{id}:
+    get:
+      summary: Gets the template for a specific integration
+      description: |
+        Get the template for a specific integration, structured appropriately and prefilled with example values.
+        Modify the defaults and POST it to /synch to create a new synch.
+      operationId: getSynchType
+      tags:
+      - SynchTypes
+      produces:
+      - application/json
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+          format: int32
+          description: Numeric ID of an existing synchType.
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/Synch"
+        400:
+          $ref: "#/responses/BadRequest"
+        404:
+          $ref: "#/responses/NotFound"
+        500:
+          $ref: "#/responses/ServerError"
+
+  /synchTest:
+    post:
+      summary: Test proposed integration
+      description: Ping the source and target of a given integration.
+      operationId: pingNewSynch
+      tags:
+      - Tests
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+        - in: body
+          name: Request Body
+          description: |
+            This object is identical with the synch template.
+          schema:
+            $ref: "#/definitions/Synch"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/TestMessage"
+        400:
+          $ref: "#/responses/BadRequest"
+        401:
+          $ref: "#/responses/Unauthorized"
+        500:
+          $ref: "#/responses/ServerError"
+
+responses:
+
+  NotFound:
+    description: Not found
+    schema:
+      $ref: "#/definitions/NotFound"
+
+  Unauthorized:
+    description: Unauthorized
+    schema:
+      $ref: "#/definitions/Unauthorized"
+
+  ServerError:
+    description: Internal server error
+    schema:
+      $ref: "#/definitions/ServerError"
+
+  BadRequest:
+    description: Bad request
+    schema:
+      $ref: "#/definitions/CustomErrorMessage"
+
+  Created:
+    description: Created
+    schema:
+      $ref: "#/definitions/CustomCreatedMessage"
+
+definitions:
+
+
+
+  SynchTypes:
+    type: object
+    required:
+    - results
+    properties:
+      results:
+        type: array
+        items:
+          $ref: "#/definitions/SynchType"
+    example:
+      results:
+        - source: ProQuest
+          target: BoomTown
+          version: 1
+          sourceImage: "http://images.com/voicepad.png"
+          targetImage: "http://images.com/voicepad.png"
+          id: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+        - source: Mojo
+          target: Firepoint
+          version: 1
+          sourceImage: "http://images.com/voicepad.png"
+          targetImage: "http://images.com/voicepad.png"
+          id: "19c0bb38-a2e2-11e7-abc4-cec278b6b50a"
+
+  SynchType:
+    type: object
+    properties:
+      source:
+        type: string
+        description: "The name of the source application"
+      target:
+        type: string
+        description: "The name of the target application"
+      version:
+        type: integer
+        format: int32
+        description: |
+          An integer to identify the version of the synch, corresponding with a certain tier of syncronization.
+      sourceImage:
+        type: string
+        description: "The URI of an image to represent the source application"
+      targetimage:
+        type: string
+        description: "The URI of an image to represent the target application"
+      id:
+        type: integer
+        format: int32
+        description: "Numeric ID of the synchType"
+    required:
+      - source
+      - target
+      - version
+      - id
+
+
+
+  Synch:
+    type: object
+    properties:
+      isDraft:
+        type: boolean
+        description: |
+          True if the synch is still being drafted
+      status:
+        type: string
+        enum: ["paused", "active"]
+        description: |
+          The state of the integration
+      friendlyName:
+        type: string
+        description: |
+          A human-friendly name for the synch
+      version:
+        $ref: "#/definitions/Version"
+      source:
+        $ref: "#/definitions/Connection"
+      target:
+        $ref: "#/definitions/Connection"
+      options:
+        $ref: "#/definitions/SynchOptions"
+      synchObjects:
+        $ref: "#/definitions/SynchObjects"
+    required:
+      - isDraft
+      - status
+      - friendlyName
+      - source
+      - target
+      - version
+      - options
+      - synchObjects
+    example:
+      isDraft: false
+      status: "paused"
+      friendlyName: "Voicepad to Salesforce"
+      version:
+        number: 1
+        description: "In this version of the sync only basic lead details are carried over"
+      source:
+        environment: "test"
+        application:
+          name: "Voicepad"
+          testAvailable: false
+          loginUrl: "https://voicepad.com/login.html"
+        credentials:
+          credentialType: "Username/Password"
+          username: "orionjensen"
+          password: "catslikefood"
+        options:
+          delimiter: " | "
+      target:
+        environment: "production"
+        application:
+          name: "Salesforce"
+          testAvailable: true
+          loginUrl: "https://salesforce.com/login.html"
+        credentials:
+          credentialType: "API Token"
+          username: "test@test.com"
+          password: "234asdf3r4"
+        options:
+          ignoreNulls: true
+          insertUpsert: "upsert"
+      options:
+        enableNotificationOnError: true
+        enableDebugLogging: false
+      synchObjects:
+        - sourceName: "Activity"
+          targetname: "History"
+          commonName: "Activity"
+          parentObject: "Lead"
+          enableObjectSync: true
+        - sourceName: "Lead"
+          targetName: "Prospect"
+          commonName: "Lead"
+          parentObject: "Activity"
+          enableObjectSync: false
+
+
+
+  Connection:
+    type: object
+    properties:
+      environment:
+        type: string
+        description: "The type of connection to make, set to 'test' for testing the integration"
+        enum: ["test", "production"]
+      application:
+        $ref: "#/definitions/Application"
+      credentials:
+        $ref: "#/definitions/Credentials"
+      options:
+        $ref: "#/definitions/ConnectionOptions"
+    required:
+      - environment
+      - application
+      - credentials
+
+  Version:
+    type: object
+    properties:
+      number:
+        type: integer
+        format: int32
+        example: 1
+        description: |
+          An integer to identify the version of the synch, corresponding with a certain tier ofsyncronization.
+      description:
+        type: string
+        description: |
+          Description of what to expect from a particular version of an integration
+        example: "In this version of the sync only basic lead details are carried over"
+    required:
+      - number
+      - description
+
+  Application:
+    type: object
+    properties:
+      name:
+        type: string
+        description: "The name of the application"
+      testAvailable:
+        type: boolean
+        description: "True if the integration can be tested beforehand"
+      loginUrl:
+        type: string
+        description: "The authentication URL associated with the application"
+    required:
+      - name
+      - testAvailable
+      - loginUrl
+
+  Credentials:
+    type: object
+    properties:
+      credentialType:
+        type: string
+        description: "Denotes the method of authentication"
+      username:
+        type: string
+        description: "Username for authentication"
+      password:
+        type: string
+        format: password
+        description: "Password for authentication"
+    required:
+      - credentialType
+      - username
+      - password
+
+  SynchObjects:
+    type: array
+    items:
+      $ref: "#/definitions/SynchObject"
+
+  SynchObject:
+    type: object
+    properties:
+      sourceName:
+        type: string
+        description: "The name of the object within the source context"
+      targetName:
+        type: string
+        description: "The name of the object within the target context"
+      commonName:
+        type: string
+        description: "A service-agnostic, common name for the object"
+      parentObject:
+        type: string
+        description: "The owner of the object, if any"
+      enableObjectSync:
+        type: boolean
+        description: "Set to true to enable automatic synchronization of the source and target objects"
+    required:
+      - sourceName
+      - targetName
+      - commonName
+      - parentObject
+      - enableObjectSync
+
+  ConnectionOptions:
+    type: object
+    properties:
+      delimiter:
+        type: string
+        description: "An arbitrary character for delimiting results"
+      ignoreNulls:
+        type: boolean
+        description: "When set to true, keys with null values are omitted"
+      insertUpsert:
+        type: string
+        enum: ["insert", "upsert"]
+        description: "When set to 'insert', creates a new record. Setting to 'upsert' updates an existing record"
+
+  SynchOptions:
+    type: object
+    properties:
+      enableNotificationOnError:
+        type: boolean
+        description: "True if configured to dispatch email notifications on error"
+      enableDebugLogging:
+        type: boolean
+        description: "True if logs are enabled. Set this to false in production"
+    required:
+      - enableNotificationOnError
+      - enableDebugLogging
+
+  Error:
+    type: object
+    properties:
+      status:
+        type: integer
+        format: int32
+        example: 404
+        description: "The HTTP status code associated with the error"
+      message:
+        type: string
+        example: "Not Found"
+        description: "The name of the HTTP error associated with the above code"
+    required:
+      - status
+      - message
+
+  Unauthorized:
+    allOf:
+      - $ref: "#/definitions/Error"
+    example:
+      status: 401
+      message: "Unauthorized"
+
+  NotFound:
+    allOf:
+      - $ref: "#/definitions/Error"
+    example:
+      status: 404
+      message: "Not Found"
+
+  ServerError:
+    allOf:
+      - $ref: "#/definitions/Error"
+    example:
+      status: 500
+      message: "Internal Error"
+
+  CustomMessage:
+    type: object
+    properties:
+      status:
+        type: string
+        example: "Success"
+        description: "An arbitrary string"
+      message:
+        type: string
+        example: "The request was successful"
+        description: "An arbitrary string"
+    required:
+      - status
+      - message
+
+  CustomCreatedMessage:
+    type: object
+    properties:
+      status:
+        type: integer
+        format: int32
+        example: 201
+        description: "The HTTP status code 201, for 'Created'"
+      message:
+        type: string
+        example: "Created"
+        description: "HTTP status 201, 'Created'"
+      id:
+        type: integer
+        format: int32
+        example: 15
+        description: "The ID of the newly created resource"
+    required:
+      - status
+      - message
+      - id
+
+  CustomErrorMessage:
+    type: object
+    properties:
+      status:
+        type: integer
+        format: int32
+        example: 400
+        description: "The HTTP status code 400, for 'Bad Request'"
+      data:
+        title: Errors
+        type: object
+        properties:
+          errors:
+            type: array
+            items:
+              type: string
+            example:
+              - "Unable to connect to source"
+              - "Target password has expired"
+            description: "A list of error messages"
+      message:
+        type: string
+        example: "Bad Request"
+        description: "The name of HTTP error 404, 'Bad Request'"
+    required:
+      - status
+      - data
+      - message
+
+
+
+  TestMessage:
+    type: object
+    properties:
+      status:
+        type: string
+        example: "Success"
+        description: "A keyword summarizing the outcome of the test"
+      data:
+        type: object
+        properties:
+          ConnectionEstablished:
+            type: boolean
+            example: false
+            description: "True if a connection was able to be made between the source and target applications"
+          ConnectionMessage:
+            type: string
+            example: "Server failed to connect"
+            description: "A message describing the status of the connection"
+        required:
+          - ConnectionEstablished
+          - ConnectionMessage
+      message:
+        type: string
+        example: "No message"
+        description: "A message describing the outcome of the test"
+    required:
+      - status
+      - data
+      - message
+
+# Added by API Auto Mocking Plugin
+schemes:
+ - https
