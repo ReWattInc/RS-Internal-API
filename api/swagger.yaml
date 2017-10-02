@@ -1,272 +1,756 @@
-swagger: '2.0'
+---
+swagger: "2.0"
 info:
-
-  title: RealSynch API
-  description: Real Estate Service Integration
+  description: "Real Estate Service Integration"
   version: "1.0.0"
-
+  title: "RealSynch API"
   contact:
-    email: haydenturek@clear-launch.com
+    email: "haydenturek@clear-launch.com"
   license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-
-
-host: virtserver.swaggerhub.com
-basePath: /Clear-Launch/RealSynch-API/1.0.0
-
-
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "virtserver.swaggerhub.com"
+basePath: "/Clear-Launch/RealSynch-API/1.0.0"
 tags:
-- name: Synchs
-- name: SynchTypes
-- name: Tests
-
-
+- name: "Users"
+- name: "Synchs"
+- name: "SynchTypes"
+- name: "Admin"
+- name: "Tests"
+schemes:
+- "https"
 paths:
-
-  /synchs:
-    post:
-      summary: Post a new integration
-      description: |
-        Create new integrations from templates obtained via GET @ /synchTypes/:id
-      operationId: postNewSynch
+  /users:
+    get:
       tags:
-      - Synchs
-      consumes:
-      - application/json
+      - "Admin"
+      summary: "Gets all users"
+      description: "Gets the index of all users.\n"
+      operationId: "getUsers"
       produces:
-      - application/json
-      parameters:
-        - in: body
-          name: Request body
-          description: |
-            This object contains the data neccesary for creating a new synch between two applications, which are
-            called the "source" and "target" applications.
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
           schema:
-            $ref: "#/definitions/Synch"
+            $ref: "#/definitions/UsersIndex"
+        401:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/Unauthorized"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/ServerError"
+      x-swagger-router-controller: "Users"
+    post:
+      tags:
+      - "Users"
+      summary: "Creates a new user"
+      description: "Creates a new user with the foreign key of the organization it\
+        \ belongs to"
+      operationId: "postUser"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "Request body"
+        description: "'Email', 'password', 'organization' and 'isAdmin' are required;\
+          \ everything else is optional\n"
+        required: false
+        schema:
+          $ref: "#/definitions/User"
       responses:
         201:
-          $ref: "#/responses/Created"
+          description: "Created"
+          schema:
+            $ref: "#/definitions/Created"
         400:
-          $ref: "#/responses/BadRequest"
+          description: "Bad Request"
+          schema:
+            $ref: "#/definitions/BadRequest"
         401:
-          $ref: "#/responses/Unauthorized"
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/Unauthorized"
         500:
-          $ref: "#/responses/ServerError"
-
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/ServerError"
+      x-swagger-router-controller: "Users"
+  /users/{id}:
+    get:
+      tags:
+      - "Users"
+      summary: "Gets a user"
+      description: "Gets an existing user by numeric ID. Passwords are omitted.\n"
+      operationId: "getUser"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Numeric ID of an existing user"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/UserSecure"
+        401:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/Unauthorized"
+        404:
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/NotFound"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/ServerError"
+      security:
+      - apiKeyHeader: []
+      x-swagger-router-controller: "Users"
+    put:
+      tags:
+      - "Users"
+      summary: "Updates a user"
+      description: "Updates an existing user with an object of fields\n"
+      operationId: "putUser"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Numeric ID of an existing user"
+        required: true
+        type: "integer"
+        format: "int32"
+      - in: "body"
+        name: "Request Body"
+        description: "An object that maps to the user schema. All properties are optional\n"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        201:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Success"
+        400:
+          description: "Bad request"
+          schema:
+            $ref: "#/definitions/BadRequest"
+        401:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/Unauthorized"
+        404:
+          description: "Not found"
+          schema:
+            $ref: "#/definitions/NotFound"
+        500:
+          description: "Internal server error"
+          schema:
+            $ref: "#/definitions/ServerError"
+      x-swagger-router-controller: "Users"
+    delete:
+      tags:
+      - "Users"
+      summary: "Deletes a user"
+      description: "Deletes an existing user by numeric ID.\n"
+      operationId: "deleteUser"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Numeric ID of an existing user"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Success"
+        401:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/Unauthorized"
+        404:
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/NotFound"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/ServerError"
+      x-swagger-router-controller: "Users"
+  /users/{id}/synchs:
+    get:
+      tags:
+      - "Users"
+      summary: "Gets synchs for a particular user"
+      description: "Gets the index of synchs for a particular user.\n"
+      operationId: "getUserSynchs"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Numeric ID of an existing user"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/SynchsIndex"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/ServerError"
+      x-swagger-router-controller: "Users"
+  /synchs:
+    get:
+      tags:
+      - "Admin"
+      summary: "Gets synchs index"
+      description: "Gets the index of all synchs"
+      operationId: "getSynchs"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/SynchsIndex_1"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/ServerError"
+      x-swagger-router-controller: "Synchs"
+    post:
+      tags:
+      - "Synchs"
+      summary: "Creates a new synch"
+      description: "Creates new integrations from templates obtained via GET @ /synchTypes/:id\n"
+      operationId: "postNewSynch"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "Request body"
+        description: "Configure the integration and provide necessary credentials\n"
+        required: false
+        schema:
+          $ref: "#/definitions/Synch"
+      responses:
+        201:
+          description: "Created"
+          schema:
+            $ref: "#/definitions/Created"
+        400:
+          description: "Bad Request"
+          schema:
+            $ref: "#/definitions/BadRequest"
+        401:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/Unauthorized"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/ServerError"
+      x-swagger-router-controller: "Synchs"
   /synchs/{id}:
     get:
-      summary: Get an existing synch by ID
-      description: |
-        Get an existing synch by ID
-      operationId: getSynch
       tags:
-      - Synchs
+      - "Synchs"
+      summary: "Get an existing synch by ID"
+      description: "Get an existing synch by numeric ID. Passwords are omitted.\n"
+      operationId: "getSynch"
       consumes:
-      - application/json
+      - "application/json"
       produces:
-      - application/json
+      - "application/json"
       parameters:
-        - in: path
-          name: id
-          required: true
-          type: integer
-          format: int32
-          description: Numeric ID of an existing synch
+      - name: "id"
+        in: "path"
+        description: "Numeric ID of an existing synch"
+        required: true
+        type: "integer"
+        format: "int32"
       responses:
         200:
-          description: OK
+          description: "OK"
           schema:
-            $ref: "#/definitions/Synch"
+            $ref: "#/definitions/SynchSecure"
         401:
-          $ref: "#/responses/Unauthorized"
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/Unauthorized"
         404:
-          $ref: "#/responses/NotFound"
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/NotFound"
         500:
-          $ref: "#/responses/ServerError"
-
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/ServerError"
+      security:
+      - apiKeyHeader: []
+      x-swagger-router-controller: "Synchs"
+    put:
+      tags:
+      - "Synchs"
+      summary: "Updates a synch"
+      description: "Updates an existing synchType with an object of fields\n"
+      operationId: "putSynch"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Numeric ID of an existing synch"
+        required: true
+        type: "integer"
+        format: "int32"
+      - in: "body"
+        name: "Request Body"
+        description: "An object that maps to the synch schema. All properties are\
+          \ optional\n"
+        required: true
+        schema:
+          $ref: "#/definitions/SynchSecure"
+      responses:
+        201:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Success"
+        400:
+          description: "Bad Request"
+          schema:
+            $ref: "#/definitions/BadRequest"
+        401:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/Unauthorized"
+        404:
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/NotFound"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/ServerError"
+      x-swagger-router-controller: "Synchs"
+    delete:
+      tags:
+      - "Synchs"
+      summary: "Deletes a synch"
+      description: "Deletes an existing synchType by numeric ID.\n"
+      operationId: "deleteSynch"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Numeric ID of an existing synch"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Success"
+        401:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/Unauthorized"
+        404:
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/NotFound"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/ServerError"
+      x-swagger-router-controller: "Synchs"
   /synchTypes:
     get:
-      summary: Gets synchType index
-      description: |
-        Get the index of supported integrations. Each record includes an ID for individual lookup,
-        as well as image URLs for interface development.
-      operationId: getSynchTypeIndex
       tags:
-      - SynchTypes
+      - "SynchTypes"
+      summary: "Gets synchTypes index"
+      description: "Get the index of supported integrations. Each record includes\
+        \ an ID for individual lookup,\nas well as image URLs for interface development.\n"
+      operationId: "getSynchTypeIndex"
       produces:
-      - application/json
+      - "application/json"
+      parameters: []
       responses:
         200:
-          description: OK
+          description: "OK"
           schema:
-            $ref: "#/definitions/SynchTypes"
+            $ref: "#/definitions/SynchTypesIndex"
         500:
-          $ref: "#/responses/ServerError"
-
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/ServerError"
+      x-swagger-router-controller: "SynchTypes"
+    post:
+      tags:
+      - "Admin"
+      summary: "Post a new synchType"
+      description: "Creates a new synchType\n"
+      operationId: "postSynchType"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "Request body"
+        description: "Admin can introduce newly supported integrations by posting\
+          \ to this endpoint.\n"
+        required: false
+        schema:
+          $ref: "#/definitions/SynchType"
+      responses:
+        201:
+          description: "Created"
+          schema:
+            $ref: "#/definitions/Created"
+        400:
+          description: "Bad Request"
+          schema:
+            $ref: "#/definitions/BadRequest"
+        401:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/Unauthorized"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/ServerError"
+      x-swagger-router-controller: "Admin"
   /synchTypes/{id}:
     get:
-      summary: Gets the template for a specific integration
-      description: |
-        Get the template for a specific integration, structured appropriately and prefilled with example values.
-        Modify the defaults and POST it to /synch to create a new synch.
-      operationId: getSynchType
       tags:
-      - SynchTypes
+      - "SynchTypes"
+      summary: "Gets the template for a specific integration"
+      description: "Get the template for a specific integration, structured appropriately\
+        \ but with missing values.\nSupply the values and POST to /synch to create\
+        \ a new synch.\n"
+      operationId: "getSynchType"
       produces:
-      - application/json
+      - "application/json"
       parameters:
-        - in: path
-          name: id
-          required: true
-          type: integer
-          format: int32
-          description: Numeric ID of an existing synchType.
+      - name: "id"
+        in: "path"
+        description: "Numeric ID of an existing synchType."
+        required: true
+        type: "integer"
+        format: "int32"
       responses:
         200:
-          description: OK
+          description: "OK"
           schema:
-            $ref: "#/definitions/Synch"
+            $ref: "#/definitions/SynchTemplate"
         400:
-          $ref: "#/responses/BadRequest"
+          description: "Bad Request"
+          schema:
+            $ref: "#/definitions/BadRequest"
         404:
-          $ref: "#/responses/NotFound"
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/NotFound"
         500:
-          $ref: "#/responses/ServerError"
-
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/ServerError"
+      x-swagger-router-controller: "SynchTypes"
+    put:
+      tags:
+      - "Admin"
+      summary: "Updates a synchType"
+      description: "Updates an existing synchType with an object of fields\n"
+      operationId: "putSynchType"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Numeric ID of an existing synch"
+        required: true
+        type: "integer"
+        format: "int32"
+      - in: "body"
+        name: "Request Body"
+        description: "An object that maps to the synchType schema. All properties\
+          \ are optional\n"
+        required: true
+        schema:
+          $ref: "#/definitions/SynchType"
+      responses:
+        201:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Success"
+        400:
+          description: "Bad Request"
+          schema:
+            $ref: "#/definitions/BadRequest"
+        401:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/Unauthorized"
+        404:
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/NotFound"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/ServerError"
+      x-swagger-router-controller: "Admin"
+    delete:
+      tags:
+      - "Admin"
+      summary: "Deletes a synchType"
+      description: "Deletes an existing synchType by numeric ID.\n"
+      operationId: "deleteSynchType"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Numeric ID of an existing synchType"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Success"
+        401:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/Unauthorized"
+        404:
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/NotFound"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/ServerError"
+      x-swagger-router-controller: "Admin"
   /synchTest:
     post:
-      summary: Test proposed integration
-      description: Ping the source and target of a given integration.
-      operationId: pingNewSynch
       tags:
-      - Tests
+      - "Tests"
+      summary: "Test proposed integration"
+      description: "Ping the source and target of a given integration."
+      operationId: "pingNewSynch"
       consumes:
-      - application/json
+      - "application/json"
       produces:
-      - application/json
+      - "application/json"
       parameters:
-        - in: body
-          name: Request Body
-          description: |
-            This object is identical with the synch template.
-          schema:
-            $ref: "#/definitions/Synch"
+      - in: "body"
+        name: "Request Body"
+        description: "Configure the integration and provide necessary credentials\n"
+        required: false
+        schema:
+          $ref: "#/definitions/Synch"
       responses:
         200:
-          description: OK
+          description: "OK"
           schema:
             $ref: "#/definitions/TestMessage"
         400:
-          $ref: "#/responses/BadRequest"
+          description: "Bad Request"
+          schema:
+            $ref: "#/definitions/BadRequest"
         401:
-          $ref: "#/responses/Unauthorized"
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/Unauthorized"
         500:
-          $ref: "#/responses/ServerError"
-
-responses:
-
-  NotFound:
-    description: Not found
-    schema:
-      $ref: "#/definitions/NotFound"
-
-  Unauthorized:
-    description: Unauthorized
-    schema:
-      $ref: "#/definitions/Unauthorized"
-
-  ServerError:
-    description: Internal server error
-    schema:
-      $ref: "#/definitions/ServerError"
-
-  BadRequest:
-    description: Bad request
-    schema:
-      $ref: "#/definitions/CustomErrorMessage"
-
-  Created:
-    description: Created
-    schema:
-      $ref: "#/definitions/CustomCreatedMessage"
-
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/ServerError"
+      x-swagger-router-controller: "Tests"
+securityDefinitions:
+  apiKeyHeader:
+    type: "apiKey"
+    name: "X-API-Key"
+    in: "header"
+  apiKeyQuery:
+    type: "apiKey"
+    name: "api_key"
+    in: "query"
 definitions:
-
-
-
-  SynchTypes:
-    type: object
+  UsersIndex:
+    type: "object"
     required:
-    - results
+    - "results"
     properties:
       results:
-        type: array
+        type: "array"
         items:
-          $ref: "#/definitions/SynchType"
+          $ref: "#/definitions/TaggedUser"
     example:
       results:
-        - source: ProQuest
-          target: BoomTown
-          version: 1
-          sourceImage: "http://images.com/voicepad.png"
-          targetImage: "http://images.com/voicepad.png"
-          id: "d290f1ee-6c54-4b01-90e6-d701748f0851"
-        - source: Mojo
-          target: Firepoint
-          version: 1
-          sourceImage: "http://images.com/voicepad.png"
-          targetImage: "http://images.com/voicepad.png"
-          id: "19c0bb38-a2e2-11e7-abc4-cec278b6b50a"
-
-  SynchType:
-    type: object
-    properties:
-      source:
-        type: string
-        description: "The name of the source application"
-      target:
-        type: string
-        description: "The name of the target application"
-      version:
-        type: integer
-        format: int32
-        description: |
-          An integer to identify the version of the synch, corresponding with a certain tier of syncronization.
-      sourceImage:
-        type: string
-        description: "The URI of an image to represent the source application"
-      targetimage:
-        type: string
-        description: "The URI of an image to represent the target application"
-      id:
-        type: integer
-        format: int32
-        description: "Numeric ID of the synchType"
+      - id: 1
+        user:
+          username: "user1"
+          firstName: "Guy"
+          lastName: "Adams"
+          email: "guy@gmail.com"
+          organization:
+            id: 15
+            name: "Tenex"
+          isAdmin: false
+      - id: 2
+        user:
+          username: "user2"
+          firstName: "Bill"
+          lastName: "Williams"
+          email: "bwill@gmail.com"
+          organization:
+            id: 25
+            name: "Crosswinds"
+          isAdmin: true
+  TaggedUser:
+    type: "object"
     required:
-      - source
-      - target
-      - version
-      - id
-
-
-
+    - "id"
+    - "user"
+    properties:
+      id:
+        type: "integer"
+        format: "int32"
+        example: 5
+        description: "Numeric ID of the user"
+      user:
+        title: "User"
+        $ref: "#/definitions/UserSecure"
+  User:
+    type: "object"
+    required:
+    - "email"
+    - "isAdmin"
+    - "password"
+    properties:
+      username:
+        type: "string"
+        description: "The username associated with the profile"
+      firstName:
+        type: "string"
+        description: "The user's first name"
+      lastName:
+        type: "string"
+        description: "The user's last name"
+      email:
+        type: "string"
+        description: "The user's email address"
+      password:
+        type: "string"
+        format: "password"
+        description: "A password for the account"
+      organization:
+        $ref: "#/definitions/Organization"
+      isAdmin:
+        type: "boolean"
+        description: "True if the user has admin privileges"
+    example:
+      username: "user2"
+      firstName: "Bill"
+      lastName: "Williams"
+      email: "bwill@gmail.com"
+      password: "passw0rd123"
+      organization:
+        id: 25
+        name: "Crosswinds"
+      isAdmin: true
+  UserSecure:
+    type: "object"
+    required:
+    - "email"
+    - "isAdmin"
+    properties:
+      username:
+        type: "string"
+        description: "The username associated with the profile"
+      firstName:
+        type: "string"
+        description: "The user's first name"
+      lastName:
+        type: "string"
+        description: "The user's last name"
+      email:
+        type: "string"
+        description: "The user's email address"
+      organization:
+        $ref: "#/definitions/Organization"
+      isAdmin:
+        type: "boolean"
+        description: "True if the user has admin privileges"
+    title: "User"
+    example:
+      username: "user2"
+      firstName: "Bill"
+      lastName: "Williams"
+      email: "bwill@gmail.com"
+      organization:
+        id: 25
+        name: "Crosswinds"
+      isAdmin: true
   Synch:
-    type: object
+    type: "object"
+    required:
+    - "friendlyName"
+    - "isDraft"
+    - "options"
+    - "source"
+    - "status"
+    - "synchObjects"
+    - "target"
+    - "version"
     properties:
       isDraft:
-        type: boolean
-        description: |
-          True if the synch is still being drafted
+        type: "boolean"
+        description: "True if the synch is still being drafted\n"
       status:
-        type: string
-        enum: ["paused", "active"]
-        description: |
-          The state of the integration
+        type: "string"
+        description: "The state of the integration\n"
+        enum:
+        - "paused"
+        - "active"
       friendlyName:
-        type: string
-        description: |
-          A human-friendly name for the synch
+        type: "string"
+        description: "A human-friendly name for the synch\n"
       version:
         $ref: "#/definitions/Version"
       source:
@@ -277,22 +761,14 @@ definitions:
         $ref: "#/definitions/SynchOptions"
       synchObjects:
         $ref: "#/definitions/SynchObjects"
-    required:
-      - isDraft
-      - status
-      - friendlyName
-      - source
-      - target
-      - version
-      - options
-      - synchObjects
     example:
       isDraft: false
       status: "paused"
       friendlyName: "Voicepad to Salesforce"
       version:
         number: 1
-        description: "In this version of the sync only basic lead details are carried over"
+        description: "In this version of the sync only basic lead details are carried\
+          \ over"
       source:
         environment: "test"
         application:
@@ -322,282 +798,564 @@ definitions:
         enableNotificationOnError: true
         enableDebugLogging: false
       synchObjects:
-        - sourceName: "Activity"
-          targetname: "History"
-          commonName: "Activity"
-          parentObject: "Lead"
-          enableObjectSync: true
-        - sourceName: "Lead"
-          targetName: "Prospect"
-          commonName: "Lead"
-          parentObject: "Activity"
-          enableObjectSync: false
-
-
-
+      - sourceName: "Activity"
+        targetname: "History"
+        commonName: "Activity"
+        parentObject: "Lead"
+        enableObjectSync: true
+      - sourceName: "Lead"
+        targetName: "Prospect"
+        commonName: "Lead"
+        parentObject: "Activity"
+        enableObjectSync: false
+  SynchSecure:
+    type: "object"
+    required:
+    - "friendlyName"
+    - "isDraft"
+    - "options"
+    - "source"
+    - "status"
+    - "synchObjects"
+    - "target"
+    - "version"
+    properties:
+      isDraft:
+        type: "boolean"
+        description: "True if the synch is still being drafted\n"
+      status:
+        type: "string"
+        description: "The state of the integration\n"
+        enum:
+        - "paused"
+        - "active"
+      friendlyName:
+        type: "string"
+        description: "A human-friendly name for the synch\n"
+      version:
+        $ref: "#/definitions/Version"
+      source:
+        $ref: "#/definitions/Connection"
+      target:
+        $ref: "#/definitions/Connection"
+      options:
+        $ref: "#/definitions/SynchOptions"
+      synchObjects:
+        $ref: "#/definitions/SynchObjects"
+    title: "Synch"
+    example:
+      isDraft: false
+      status: "active"
+      friendlyName: "Voicepad to Salesforce"
+      version:
+        number: 1
+        description: "In this version of the sync only basic lead details are carried\
+          \ over"
+      source:
+        environment: "production"
+        application:
+          name: "Voicepad"
+          testAvailable: false
+          loginUrl: "https://voicepad.com/login.html"
+        credentials:
+          credentialType: "Username/Password"
+          username: "orionjensen"
+          password: ""
+        options:
+          delimiter: " | "
+      target:
+        environment: "production"
+        application:
+          name: "Salesforce"
+          testAvailable: true
+          loginUrl: "https://salesforce.com/login.html"
+        credentials:
+          credentialType: "API Token"
+          username: "test@test.com"
+          password: ""
+        options:
+          ignoreNulls: true
+          insertUpsert: "upsert"
+      options:
+        enableNotificationOnError: true
+        enableDebugLogging: false
+      synchObjects:
+      - sourceName: "Activity"
+        targetname: "History"
+        commonName: "Activity"
+        parentObject: "Lead"
+        enableObjectSync: true
+      - sourceName: "Lead"
+        targetName: "Prospect"
+        commonName: "Lead"
+        parentObject: "Activity"
+        enableObjectSync: false
+  SynchTemplate:
+    type: "object"
+    required:
+    - "friendlyName"
+    - "isDraft"
+    - "options"
+    - "source"
+    - "status"
+    - "synchObjects"
+    - "target"
+    - "version"
+    properties:
+      isDraft:
+        type: "boolean"
+        description: "True if the synch is still being drafted\n"
+      status:
+        type: "string"
+        description: "The state of the integration\n"
+        enum:
+        - "paused"
+        - "active"
+      friendlyName:
+        type: "string"
+        description: "A human-friendly name for the synch\n"
+      version:
+        $ref: "#/definitions/Version"
+      source:
+        $ref: "#/definitions/Connection"
+      target:
+        $ref: "#/definitions/Connection"
+      options:
+        $ref: "#/definitions/SynchOptions"
+      synchObjects:
+        $ref: "#/definitions/SynchObjects"
+    title: "Synch"
+    example:
+      isDraft: true
+      status: "paused"
+      friendlyName: ""
+      version:
+        number: 1
+        description: "In this version of the sync only basic lead details are carried\
+          \ over"
+      source:
+        environment: "test"
+        application:
+          name: "Voicepad"
+          testAvailable: false
+          loginUrl: "https://voicepad.com/login.html"
+        credentials:
+          credentialType: "Username/Password"
+          username: ""
+          password: ""
+        options:
+          delimiter: ""
+          ignoreNulls: true
+          insertUpsert: ""
+      target:
+        environment: "test"
+        application:
+          name: "Salesforce"
+          testAvailable: true
+          loginUrl: "https://salesforce.com/login.html"
+        credentials:
+          credentialType: "API Token"
+          username: ""
+          password: ""
+        options:
+          delimiter: ""
+          ignoreNulls: true
+          insertUpsert: ""
+      options:
+        enableNotificationOnError: true
+        enableDebugLogging: false
+      synchObjects:
+      - sourceName: ""
+        targetname: ""
+        commonName: ""
+        parentObject: ""
+        enableObjectSync: true
+  TaggedSynch:
+    type: "object"
+    required:
+    - "id"
+    - "synch"
+    properties:
+      id:
+        type: "integer"
+        format: "int32"
+        example: 5
+        description: "Numeric ID of the synch"
+      synch:
+        title: "Synch"
+        $ref: "#/definitions/SynchSecure"
+  SynchsIndex:
+    type: "object"
+    required:
+    - "results"
+    properties:
+      results:
+        type: "array"
+        items:
+          $ref: "#/definitions/TaggedSynch"
+  SynchTypesIndex:
+    type: "object"
+    required:
+    - "results"
+    properties:
+      results:
+        type: "array"
+        items:
+          $ref: "#/definitions/TaggedSynchType"
+    example:
+      results:
+      - id: 15
+        synchType:
+          source: "ProQuest"
+          target: "BoomTown"
+          version: 1
+          sourceImage: "http://images.com/voicepad.png"
+          targetImage: "http://images.com/voicepad.png"
+      - id: 16
+        synchType:
+          source: "Mojo"
+          target: "Firepoint"
+          version: 1
+          sourceImage: "http://images.com/voicepad.png"
+          targetImage: "http://images.com/voicepad.png"
+  SynchType:
+    type: "object"
+    required:
+    - "source"
+    - "target"
+    - "version"
+    properties:
+      source:
+        type: "string"
+        description: "The name of the source application"
+      target:
+        type: "string"
+        description: "The name of the target application"
+      version:
+        type: "integer"
+        format: "int32"
+        description: "An integer to identify the version of the synch, corresponding\
+          \ with a certain tier of synchronization\n"
+      sourceImage:
+        type: "string"
+        description: "The URI of an image to represent the source application"
+      targetimage:
+        type: "string"
+        description: "The URI of an image to represent the target application"
+    example:
+      source: "ProQuest"
+      target: "BoomTown"
+      version: 1
+      sourceImage: "http://images.com/voicepad.png"
+      targetImage: "http://images.com/voicepad.png"
+  TaggedSynchType:
+    type: "object"
+    required:
+    - "id"
+    - "synchType"
+    properties:
+      id:
+        type: "integer"
+        format: "int32"
+        example: 5
+        description: "Numeric ID of an existing synchType"
+      synchType:
+        title: "SynchType"
+        $ref: "#/definitions/SynchType"
   Connection:
-    type: object
+    type: "object"
+    required:
+    - "application"
+    - "credentials"
+    - "environment"
     properties:
       environment:
-        type: string
-        description: "The type of connection to make, set to 'test' for testing the integration"
-        enum: ["test", "production"]
+        type: "string"
+        description: "The type of connection to make, set to 'test' for testing the\
+          \ integration"
+        enum:
+        - "test"
+        - "production"
       application:
         $ref: "#/definitions/Application"
       credentials:
         $ref: "#/definitions/Credentials"
       options:
         $ref: "#/definitions/ConnectionOptions"
-    required:
-      - environment
-      - application
-      - credentials
-
   Version:
-    type: object
+    type: "object"
+    required:
+    - "description"
+    - "number"
     properties:
       number:
-        type: integer
-        format: int32
+        type: "integer"
+        format: "int32"
         example: 1
-        description: |
-          An integer to identify the version of the synch, corresponding with a certain tier ofsyncronization.
+        description: "An integer to identify the version of the synch, corresponding\
+          \ with a certain tier ofsyncronization.\n"
       description:
-        type: string
-        description: |
-          Description of what to expect from a particular version of an integration
-        example: "In this version of the sync only basic lead details are carried over"
-    required:
-      - number
-      - description
-
+        type: "string"
+        example: "In this version of the sync only basic lead details are carried\
+          \ over"
+        description: "Description of what to expect from a particular version of an\
+          \ integration\n"
   Application:
-    type: object
+    type: "object"
+    required:
+    - "loginUrl"
+    - "name"
+    - "testAvailable"
     properties:
       name:
-        type: string
+        type: "string"
         description: "The name of the application"
       testAvailable:
-        type: boolean
+        type: "boolean"
         description: "True if the integration can be tested beforehand"
       loginUrl:
-        type: string
+        type: "string"
         description: "The authentication URL associated with the application"
-    required:
-      - name
-      - testAvailable
-      - loginUrl
-
   Credentials:
-    type: object
+    type: "object"
+    required:
+    - "credentialType"
+    - "password"
+    - "username"
     properties:
       credentialType:
-        type: string
+        type: "string"
         description: "Denotes the method of authentication"
       username:
-        type: string
+        type: "string"
         description: "Username for authentication"
       password:
-        type: string
-        format: password
+        type: "string"
+        format: "password"
         description: "Password for authentication"
-    required:
-      - credentialType
-      - username
-      - password
-
   SynchObjects:
-    type: array
+    type: "array"
     items:
       $ref: "#/definitions/SynchObject"
-
   SynchObject:
-    type: object
+    type: "object"
+    required:
+    - "commonName"
+    - "enableObjectSync"
+    - "parentObject"
+    - "sourceName"
+    - "targetName"
     properties:
       sourceName:
-        type: string
+        type: "string"
         description: "The name of the object within the source context"
       targetName:
-        type: string
+        type: "string"
         description: "The name of the object within the target context"
       commonName:
-        type: string
+        type: "string"
         description: "A service-agnostic, common name for the object"
       parentObject:
-        type: string
+        type: "string"
         description: "The owner of the object, if any"
       enableObjectSync:
-        type: boolean
-        description: "Set to true to enable automatic synchronization of the source and target objects"
-    required:
-      - sourceName
-      - targetName
-      - commonName
-      - parentObject
-      - enableObjectSync
-
+        type: "boolean"
+        description: "Set to true to enable automatic synchronization of the source\
+          \ and target objects"
   ConnectionOptions:
-    type: object
+    type: "object"
     properties:
       delimiter:
-        type: string
+        type: "string"
         description: "An arbitrary character for delimiting results"
       ignoreNulls:
-        type: boolean
+        type: "boolean"
         description: "When set to true, keys with null values are omitted"
       insertUpsert:
-        type: string
-        enum: ["insert", "upsert"]
-        description: "When set to 'insert', creates a new record. Setting to 'upsert' updates an existing record"
-
+        type: "string"
+        description: "When set to 'insert', creates a new record. Setting to 'upsert'\
+          \ updates an existing record"
+        enum:
+        - "insert"
+        - "upsert"
   SynchOptions:
-    type: object
+    type: "object"
+    required:
+    - "enableDebugLogging"
+    - "enableNotificationOnError"
     properties:
       enableNotificationOnError:
-        type: boolean
+        type: "boolean"
         description: "True if configured to dispatch email notifications on error"
       enableDebugLogging:
-        type: boolean
+        type: "boolean"
         description: "True if logs are enabled. Set this to false in production"
+  StatusMessage:
+    type: "object"
     required:
-      - enableNotificationOnError
-      - enableDebugLogging
-
-  Error:
-    type: object
+    - "message"
+    - "status"
     properties:
       status:
-        type: integer
-        format: int32
+        type: "integer"
+        format: "int32"
         example: 404
-        description: "The HTTP status code associated with the error"
+        description: "An HTTP status code"
       message:
-        type: string
+        type: "string"
         example: "Not Found"
-        description: "The name of the HTTP error associated with the above code"
-    required:
-      - status
-      - message
-
+        description: "An HTTP status"
   Unauthorized:
     allOf:
-      - $ref: "#/definitions/Error"
-    example:
-      status: 401
-      message: "Unauthorized"
-
+    - $ref: "#/definitions/StatusMessage"
+    - {}
   NotFound:
     allOf:
-      - $ref: "#/definitions/Error"
-    example:
-      status: 404
-      message: "Not Found"
-
+    - $ref: "#/definitions/StatusMessage"
+    - {}
   ServerError:
     allOf:
-      - $ref: "#/definitions/Error"
-    example:
-      status: 500
-      message: "Internal Error"
-
-  CustomMessage:
-    type: object
-    properties:
-      status:
-        type: string
-        example: "Success"
-        description: "An arbitrary string"
-      message:
-        type: string
-        example: "The request was successful"
-        description: "An arbitrary string"
+    - $ref: "#/definitions/StatusMessage"
+    - {}
+  BadRequest:
+    allOf:
+    - $ref: "#/definitions/StatusMessage"
+    - properties:
+        data:
+          $ref: "#/definitions/Data"
+  Created:
+    type: "object"
     required:
-      - status
-      - message
-
-  CustomCreatedMessage:
-    type: object
+    - "id"
+    - "message"
+    - "status"
     properties:
       status:
-        type: integer
-        format: int32
-        example: 201
-        description: "The HTTP status code 201, for 'Created'"
+        type: "integer"
+        format: "int32"
+        example: 404
+        description: "An HTTP status code"
       message:
-        type: string
-        example: "Created"
-        description: "HTTP status 201, 'Created'"
+        type: "string"
+        example: "Not Found"
+        description: "An HTTP status"
       id:
-        type: integer
-        format: int32
-        example: 15
-        description: "The ID of the newly created resource"
+        type: "integer"
+        format: "int32"
+        description: "Numeric ID of the newly created resource"
+    example:
+      status: 201
+      message: "Created"
+      id: 15
+  Success:
+    type: "object"
     required:
-      - status
-      - message
-      - id
-
-  CustomErrorMessage:
-    type: object
+    - "message"
+    - "status"
     properties:
       status:
-        type: integer
-        format: int32
-        example: 400
-        description: "The HTTP status code 400, for 'Bad Request'"
-      data:
-        title: Errors
-        type: object
-        properties:
-          errors:
-            type: array
-            items:
-              type: string
-            example:
-              - "Unable to connect to source"
-              - "Target password has expired"
-            description: "A list of error messages"
+        type: "integer"
+        format: "int32"
+        description: "An HTTP status code"
       message:
-        type: string
-        example: "Bad Request"
-        description: "The name of HTTP error 404, 'Bad Request'"
-    required:
-      - status
-      - data
-      - message
-
-
-
+        type: "string"
+        description: "An HTTP status"
+    example:
+      status: 200
+      message: "OK"
   TestMessage:
-    type: object
+    type: "object"
+    required:
+    - "message"
+    - "status"
     properties:
       status:
-        type: string
+        type: "string"
         example: "Success"
         description: "A keyword summarizing the outcome of the test"
       data:
-        type: object
-        properties:
-          ConnectionEstablished:
-            type: boolean
-            example: false
-            description: "True if a connection was able to be made between the source and target applications"
-          ConnectionMessage:
-            type: string
-            example: "Server failed to connect"
-            description: "A message describing the status of the connection"
-        required:
-          - ConnectionEstablished
-          - ConnectionMessage
+        title: "Data"
+        $ref: "#/definitions/TestMessage_data"
       message:
-        type: string
+        type: "string"
         example: "No message"
         description: "A message describing the outcome of the test"
+  Data:
     required:
-      - status
-      - data
-      - message
-
-# Added by API Auto Mocking Plugin
-schemes:
- - https
+    - "errors"
+    properties:
+      errors:
+        type: "array"
+        description: "A collection of error messages"
+        items:
+          type: "string"
+    description: "Additional data"
+  TestMessage_data:
+    required:
+    - "ConnectionEstablished"
+    - "ConnectionMessage"
+    properties:
+      ConnectionEstablished:
+        type: "boolean"
+        example: false
+        description: "True if a connection was able to be made between the source\
+          \ and target applications"
+      ConnectionMessage:
+        type: "string"
+        example: "Server failed to connect"
+        description: "A message describing the status of the connection"
+  TaggedSynch_1:
+    properties:
+      id:
+        type: "integer"
+        format: "int32"
+        example: 14
+        description: "Numeric ID of an existing synch"
+      user:
+        type: "integer"
+        format: "int32"
+        example: 5
+        description: "Foreign key of the user that created the synch"
+      synch:
+        title: "Synch"
+        $ref: "#/definitions/SynchSecure"
+  SynchsIndex_1:
+    properties:
+      results:
+        type: "array"
+        items:
+          $ref: "#/definitions/TaggedSynch_1"
+  Organization:
+    properties:
+      id:
+        type: "integer"
+        format: "int32"
+        description: "A foreign key for the organization that owns the user"
+      name:
+        type: "string"
+        description: "The name of the organization"
+responses:
+  BadRequest:
+    description: "Bad request"
+    schema:
+      $ref: "#/definitions/BadRequest"
+  Created:
+    description: "Created"
+    schema:
+      $ref: "#/definitions/Created"
+  NotFound:
+    description: "Not found"
+    schema:
+      $ref: "#/definitions/NotFound"
+  ServerError:
+    description: "Internal server error"
+    schema:
+      $ref: "#/definitions/ServerError"
+  Success:
+    description: "OK"
+    schema:
+      $ref: "#/definitions/Success"
+  Unauthorized:
+    description: "Unauthorized"
+    schema:
+      $ref: "#/definitions/Unauthorized"

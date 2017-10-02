@@ -3,11 +3,13 @@
 exports.getSynchType = function(args, res, next) {
   /**
    * parameters expected in the args:
-  * id (UUID)
+  * id (Integer)
   **/
     var examples = {};
   examples['application/json'] = {
-  "optionsList" : {
+  "synchObjects" : "",
+  "isDraft" : true,
+  "options" : {
     "enableNotificationOnError" : true,
     "enableDebugLogging" : true
   },
@@ -34,8 +36,6 @@ exports.getSynchType = function(args, res, next) {
     "description" : "In this version of the sync only basic lead details are carried over"
   },
   "friendlyName" : "aeiou",
-  "objectList" : "",
-  "isComplete" : true,
   "status" : "aeiou",
   "target" : ""
 };
@@ -56,12 +56,14 @@ exports.getSynchTypeIndex = function(args, res, next) {
     var examples = {};
   examples['application/json'] = {
   "results" : [ {
-    "targetimage" : "aeiou",
-    "source" : "aeiou",
-    "sourceImage" : "aeiou",
-    "id" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
-    "version" : 123,
-    "target" : "aeiou"
+    "id" : 5,
+    "synchType" : {
+      "targetimage" : "aeiou",
+      "source" : "aeiou",
+      "sourceImage" : "aeiou",
+      "version" : 123,
+      "target" : "aeiou"
+    }
   } ]
 };
   if(Object.keys(examples).length > 0) {
