@@ -216,6 +216,14 @@ paths:
           description: "OK"
           schema:
             $ref: "#/definitions/SynchsIndex"
+        401:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/Unauthorized"
+        404:
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/NotFound"
         500:
           description: "Internal Server Error"
           schema:
@@ -236,6 +244,10 @@ paths:
           description: "OK"
           schema:
             $ref: "#/definitions/SynchsIndex_1"
+        401:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/Unauthorized"
         500:
           description: "Internal Server Error"
           schema:
@@ -678,7 +690,7 @@ definitions:
       password:
         type: "string"
         format: "password"
-        description: "A password for the account"
+        description: "A plain text password for the account"
       organization:
         $ref: "#/definitions/Organization"
       isAdmin:
@@ -1007,7 +1019,7 @@ definitions:
       - id: 15
         synchType:
           source: "ProQuest"
-          target: "BoomTown"
+          target: "SalesForceTesting"
           version: 1
           sourceImage: "http://images.com/voicepad.png"
           targetImage: "http://images.com/voicepad.png"
@@ -1071,8 +1083,8 @@ definitions:
     properties:
       environment:
         type: "string"
-        description: "The type of connection to make, set to 'test' for testing the\
-          \ integration"
+        description: "The connection environment. Use 'production' for live connections,\
+          \ 'test' for mock connections\n"
         enum:
         - "test"
         - "production"
@@ -1093,7 +1105,7 @@ definitions:
         format: "int32"
         example: 1
         description: "An integer to identify the version of the synch, corresponding\
-          \ with a certain tier ofsyncronization.\n"
+          \ with a certain tier of syncronization.\n"
       description:
         type: "string"
         example: "In this version of the sync only basic lead details are carried\
