@@ -582,7 +582,7 @@ paths:
       tags:
       - "Tests"
       summary: "Test proposed integration"
-      description: "Ping the source and target of a given integration."
+      description: "Ping one end of a given integration."
       operationId: "pingNewSynch"
       consumes:
       - "application/json"
@@ -591,10 +591,10 @@ paths:
       parameters:
       - in: "body"
         name: "Request Body"
-        description: "Configure the integration and provide necessary credentials\n"
+        description: "Test a connection by posting a connection object"
         required: false
         schema:
-          $ref: "#/definitions/Synch"
+          $ref: "#/definitions/Connection"
       responses:
         200:
           description: "OK"
@@ -742,6 +742,7 @@ definitions:
   Synch:
     type: "object"
     required:
+    - "synchType"
     - "friendlyName"
     - "isDraft"
     - "options"
@@ -751,6 +752,9 @@ definitions:
     - "target"
     - "version"
     properties:
+      synchType:
+        type: "string"
+        description: "Numeric ID of the type of synch, or synchType"
       isDraft:
         type: "boolean"
         description: "True if the synch is still being drafted\n"
@@ -774,6 +778,7 @@ definitions:
       synchObjects:
         $ref: "#/definitions/SynchObjects"
     example:
+      synchType: 8
       isDraft: false
       status: "paused"
       friendlyName: "Voicepad to Salesforce"
@@ -823,6 +828,7 @@ definitions:
   SynchSecure:
     type: "object"
     required:
+    - "synchType"
     - "friendlyName"
     - "isDraft"
     - "options"
@@ -832,6 +838,9 @@ definitions:
     - "target"
     - "version"
     properties:
+      synchType:
+        type: "string"
+        description: "Numeric ID of the type of synch, or synchType"
       isDraft:
         type: "boolean"
         description: "True if the synch is still being drafted\n"
@@ -856,6 +865,7 @@ definitions:
         $ref: "#/definitions/SynchObjects"
     title: "Synch"
     example:
+      synchType: 8
       isDraft: false
       status: "active"
       friendlyName: "Voicepad to Salesforce"
@@ -914,6 +924,9 @@ definitions:
     - "target"
     - "version"
     properties:
+      synchType:
+        type: "boolean"
+        description: "Numeric ID of the type of synch, or synchType"
       isDraft:
         type: "boolean"
         description: "True if the synch is still being drafted\n"
@@ -938,6 +951,7 @@ definitions:
         $ref: "#/definitions/SynchObjects"
     title: "Synch"
     example:
+      synchType: 8
       isDraft: true
       status: "paused"
       friendlyName: ""
@@ -1094,6 +1108,19 @@ definitions:
         $ref: "#/definitions/Credentials"
       options:
         $ref: "#/definitions/ConnectionOptions"
+    example:
+      environment: "test"
+      application:
+        name: "Salesforce"
+        testAvailable: true
+        loginUrl: "https://salesforce.com/login.html"
+      credentials:
+        credentialType: "API Token"
+        username: "test@test.com"
+        password: "234asdf3r4"
+      options:
+        ignoreNulls: true
+        insertUpsert: "upsert"
   Version:
     type: "object"
     required:
