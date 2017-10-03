@@ -1033,7 +1033,7 @@ definitions:
       - id: 15
         synchType:
           source: "ProQuest"
-          target: "SalesForceTesting"
+          target: "SalesForceTesting 3"
           version: 1
           sourceImage: "http://images.com/voicepad.png"
           targetImage: "http://images.com/voicepad.png"
